@@ -46,7 +46,6 @@ main {
   background-color: lightgray;
 }
 
-
 .flex-container {
   display: flex;
   justify-content: center;
