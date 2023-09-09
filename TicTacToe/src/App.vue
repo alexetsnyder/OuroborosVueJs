@@ -43,19 +43,14 @@ function MakeMove(x:number, y:number) {
 		return;
 	}
 
-	// if (player.value === 'X')
-	// {
-	// 	board.value[x][y] = player.value;
+	if (player.value === 'X')
+	{
+		board.value[x][y] = player.value;
 
-	// 	//player.value = 'O'
-    //     player.value = (player.value === 'X') ? 'O' : 'X'
+		player.value = 'O'
 
-	// 	//ComputerMove();
-	// }
-
-    board.value[x][y] = player.value;
-
-    player.value = (player.value === 'X') ? 'O' : 'X'
+		ComputerMove();
+	}
 }
 
 function ComputerMove() {
@@ -65,11 +60,12 @@ function ComputerMove() {
 			return
 		}
 
-        alert('before compute')
-
 		let [i, j] = GetComputerMove()
 
-        alert('after compute')
+        if (i === -1 && j === -1) {
+            alert("Computer Move Failed!")
+            return
+        }
 
 		board.value[i][j] = player.value;
 
@@ -94,7 +90,7 @@ function GetPossibleMoves(array:Array<Array<string>>) {
     return possibleMoves
 }
 
-function GetBoardCopies(array:Array<Array<string>>, count:number)
+function GetArrayCopies(array:Array<Array<string>>, count:number)
 {
     const arrayCopies = []
     for (let i = 0; i < count; i++)
@@ -105,9 +101,9 @@ function GetBoardCopies(array:Array<Array<string>>, count:number)
 		    ['', '', '']
 	    ]
 
-        for (let i = 0; i < board.value.length; i++) {
-            for (let j = 0; j < board.value[i].length; j++) {
-                arrayCopy[i][j] = board.value[i][j];
+        for (let i = 0; i < array.length; i++) {
+            for (let j = 0; j < array[i].length; j++) {
+                arrayCopy[i][j] = array[i][j];
             }
         }
 
@@ -130,13 +126,12 @@ function Count(array:Array<boolean>, value:boolean) {
     return count;
 }
 
-
 function Evaluate(array:Array<Array<string>>) {
     let branches = []
 
     let possibleMoves = GetPossibleMoves(array)
 
-    let arrayCopies = GetBoardCopies(array, possibleMoves.length)
+    let arrayCopies = GetArrayCopies(array, possibleMoves.length)
 
     let index = 0;
     for (let i = 0; i < arrayCopies.length; i++) {
@@ -148,7 +143,7 @@ function Evaluate(array:Array<Array<string>>) {
         }
         else
         {
-            let games = EvaluateStack(arrayCopies[i], 'O')
+            let games = EvaluateStack(arrayCopies[i])
             let treeBranch = {
                 move: [j, k],
                 gamesWon: Count(games, true),
@@ -160,41 +155,49 @@ function Evaluate(array:Array<Array<string>>) {
 	
     for (let i = 0; i < branches.length; i++) {
         let [j, k] = branches[i].move
-        alert(`Move: [${j}, ${k}] Won: ${branches[i].gamesWon} Lost: ${branches[i].gamesLost}`)
+        if (branches[i].gamesWon > branches[i].gamesLost)
+        {
+            return [j, k]
+        }
     }
 
-    return [1, 2]
+    return [-1, -1]
 }
 
-function EvaluateStack(array:Array<Array<string>>, fPlayer:string) : Array<boolean> {
-    let stack = [array]
+function EvaluateStack(array:Array<Array<string>>) : Array<boolean> {
+    let stack = [{ player: player.value, array: array}]
     let games = []
 
     while (stack.length > 0)
     {
-        let nextArray = stack.pop() as Array<Array<string>>
+        let nextObj = stack.pop()
+        
+        if (nextObj !== undefined)
+        {
+            let fPlayer = nextObj.player
 
-        alert(nextArray)
-        let possibleMoves = GetPossibleMoves(nextArray)
-        alert(possibleMoves)
+            let nextArray = nextObj.array
 
-        let arrayCopies = GetBoardCopies(nextArray, possibleMoves.length)
+            let possibleMoves = GetPossibleMoves(nextArray)
 
-        let index = 0;
-        for (let i = 0; i < arrayCopies.length; i++) {
-            let [j, k] = possibleMoves[index++]
+            let arrayCopies = GetArrayCopies(nextArray, possibleMoves.length)
 
-            arrayCopies[i][j][k] = fPlayer
+            let index = 0;
+            for (let i = 0; i < arrayCopies.length; i++) {
+                let [j, k] = possibleMoves[index++]
 
-            if (fPlayer === 'O' && CheckForWinner(arrayCopies[i].flat())) {
-                games.push(true)
-            }
-            else if (fPlayer === 'X' && CheckForWinner(arrayCopies[i].flat())) {
-                games.push(false);
-            }
-            else
-            {
-                stack.push(arrayCopies[i])
+                arrayCopies[i][j][k] = fPlayer
+
+                if (fPlayer === 'O' && CheckForWinner(arrayCopies[i].flat())) {
+                    games.push(true)
+                }
+                else if (fPlayer === 'X' && CheckForWinner(arrayCopies[i].flat())) {
+                    games.push(false);
+                }
+                else
+                {
+                    stack.push({ player: fPlayer === 'X' ? 'O' : 'X', array: arrayCopies[i] })
+                }
             }
         }
     }
