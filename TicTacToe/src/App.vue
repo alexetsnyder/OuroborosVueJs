@@ -113,7 +113,12 @@ function GetArrayCopies(array:Array<Array<string>>, count:number)
 }
 
 function GetComputerMove() {
-    return Evaluate(board.value)
+    //return Evaluate(board.value)
+    let ret = EvaluateRecursive(board.value, player.value)
+    if (ret) {
+        return ret
+    }
+    return [-1, -1]
 }
 
 function Count(array:Array<boolean>, value:boolean) {
@@ -164,12 +169,59 @@ function Evaluate(array:Array<Array<string>>) {
     return [-1, -1]
 }
 
+function EvaluateRecursive(array:Array<Array<string>>, fPlayer:string) {
+    const possibleMoves = GetPossibleMoves(array)
+
+    const arrayCopies = GetArrayCopies(array, possibleMoves.length)
+
+    const branches = []
+    for (let i = 0; i < possibleMoves.length; i++) {
+        if (EvaluateMove(arrayCopies[i], possibleMoves[i], fPlayer)) {
+            return (fPlayer === 'X') ? possibleMoves[i] : null
+        }
+        else {
+            let branch : {
+                move: Array<number>;
+                game: Array<number> | null;
+            }
+
+            branch = {
+                move: possibleMoves[i],
+                game: EvaluateRecursive(arrayCopies[i], (fPlayer === 'X') ? 'O' : 'X')
+            }
+            branches.push(branch)
+        }
+    }
+
+    for (let i = 0; i < branches.length; i++) {
+        if (branches[i].game) {
+            return branches[i].move
+        }       
+    }
+
+    return (branches.length > 0) ? branches[0].move : null
+}
+
+function EvaluateMove(array:Array<Array<string>>, move:Array<number>, fPlayer:string) {
+    let [i, j] = move
+
+    array[i][j] = fPlayer
+
+    if (CheckForWinner(array.flat())) {
+        return fPlayer
+    }
+
+    return null
+}
+
 function EvaluateStack(array:Array<Array<string>>) : Array<boolean> {
     let stack = [{ player: player.value, array: array}]
     let games = []
+    let count = 0
 
     while (stack.length > 0)
     {
+        count++
         let nextObj = stack.pop()
         
         if (nextObj !== undefined)
@@ -199,7 +251,7 @@ function EvaluateStack(array:Array<Array<string>>) : Array<boolean> {
                     stack.push({ player: fPlayer === 'X' ? 'O' : 'X', array: arrayCopies[i] })
                 }
             }
-        }
+        } 
     }
     
     return games
