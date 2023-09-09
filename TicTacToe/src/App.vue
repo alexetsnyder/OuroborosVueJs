@@ -63,7 +63,6 @@ function ComputerMove() {
 		let [i, j] = GetComputerMove()
 
         if (i === -1 && j === -1) {
-            alert("Computer Move Failed!")
             return
         }
 
@@ -113,59 +112,10 @@ function GetArrayCopies(array:Array<Array<string>>, count:number)
 }
 
 function GetComputerMove() {
-    //return Evaluate(board.value)
     let ret = EvaluateRecursive(board.value, player.value)
     if (ret) {
         return ret
     }
-    return [-1, -1]
-}
-
-function Count(array:Array<boolean>, value:boolean) {
-    let count = 0
-    for (let i = 0; i < array.length; i++) {
-        if (array[i] === value) {
-            count++
-        }
-    }
-    return count;
-}
-
-function Evaluate(array:Array<Array<string>>) {
-    let branches = []
-
-    let possibleMoves = GetPossibleMoves(array)
-
-    let arrayCopies = GetArrayCopies(array, possibleMoves.length)
-
-    let index = 0;
-    for (let i = 0; i < arrayCopies.length; i++) {
-        let [j, k] = possibleMoves[index++]
-        arrayCopies[i][j][k] = player.value 
-
-        if (CheckForWinner(arrayCopies[i].flat())) {
-            return [j, k]
-        }
-        else
-        {
-            let games = EvaluateStack(arrayCopies[i])
-            let treeBranch = {
-                move: [j, k],
-                gamesWon: Count(games, true),
-                gamesLost: Count(games, false)
-            }
-            branches.push(treeBranch)
-        }
-    }
-	
-    for (let i = 0; i < branches.length; i++) {
-        let [j, k] = branches[i].move
-        if (branches[i].gamesWon > branches[i].gamesLost)
-        {
-            return [j, k]
-        }
-    }
-
     return [-1, -1]
 }
 
@@ -177,7 +127,7 @@ function EvaluateRecursive(array:Array<Array<string>>, fPlayer:string) {
     const branches = []
     for (let i = 0; i < possibleMoves.length; i++) {
         if (EvaluateMove(arrayCopies[i], possibleMoves[i], fPlayer)) {
-            return (fPlayer === 'X') ? possibleMoves[i] : null
+            return (fPlayer === 'O') ? possibleMoves[i] : null
         }
         else {
             let branch : {
@@ -212,49 +162,6 @@ function EvaluateMove(array:Array<Array<string>>, move:Array<number>, fPlayer:st
     }
 
     return null
-}
-
-function EvaluateStack(array:Array<Array<string>>) : Array<boolean> {
-    let stack = [{ player: player.value, array: array}]
-    let games = []
-    let count = 0
-
-    while (stack.length > 0)
-    {
-        count++
-        let nextObj = stack.pop()
-        
-        if (nextObj !== undefined)
-        {
-            let fPlayer = nextObj.player
-
-            let nextArray = nextObj.array
-
-            let possibleMoves = GetPossibleMoves(nextArray)
-
-            let arrayCopies = GetArrayCopies(nextArray, possibleMoves.length)
-
-            let index = 0;
-            for (let i = 0; i < arrayCopies.length; i++) {
-                let [j, k] = possibleMoves[index++]
-
-                arrayCopies[i][j][k] = fPlayer
-
-                if (fPlayer === 'O' && CheckForWinner(arrayCopies[i].flat())) {
-                    games.push(true)
-                }
-                else if (fPlayer === 'X' && CheckForWinner(arrayCopies[i].flat())) {
-                    games.push(false);
-                }
-                else
-                {
-                    stack.push({ player: fPlayer === 'X' ? 'O' : 'X', array: arrayCopies[i] })
-                }
-            }
-        } 
-    }
-    
-    return games
 }
 
 function Reset() {
