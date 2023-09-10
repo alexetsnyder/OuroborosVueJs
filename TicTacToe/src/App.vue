@@ -74,6 +74,37 @@ function ComputerMove() {
 	}
 }
 
+function CheckForDouble(flatBoard:string[], fPlayer:string) {
+	const checks = [
+		[0, 1, 2],
+        [0, 3, 6],
+
+        [2, 1, 0],
+        [2, 5, 8],
+
+        [6, 3, 0], 
+        [6, 7, 8],
+
+        [8, 7, 6],
+        [8, 5, 2],
+	]
+
+    if (flatBoard[4] === fPlayer) {
+        for (let i = 0; i < checks.length; i+=2) {
+		    let [a, b, c] = checks[i]
+            let [d, e, f] = checks[i+1]
+
+            if (flatBoard[a] === fPlayer && flatBoard[b] === '' && flatBoard[c] === '' &&
+                flatBoard[d] === fPlayer && flatBoard[e] === '' && flatBoard[f] === '') {
+                return fPlayer
+            }   
+	    }
+    }
+	
+	return null
+}
+
+
 function GetComputerMove() {
     return Evaluate(board.value, player.value)
 }
@@ -256,7 +287,7 @@ function EvaluateMove(array:string[][], move:number[], fPlayer:string) {
 
     array[i][j] = fPlayer
 
-    if (CheckForWinner(array.flat())) {
+    if (CheckForWinner(array.flat()) || (fPlayer === 'X' && CheckForDouble(array.flat(), fPlayer))) {
         return fPlayer
     }
 
