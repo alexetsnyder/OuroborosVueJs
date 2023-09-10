@@ -164,21 +164,8 @@ function CreateBranch(moves:number[][], winner:string) : Branch {
 }
 
 function Evaluate(array:string[][], fPlayer:string) : number[] {
-    const possibleMoves = GetPossibleMoves(array)
-
-    const arrayCopies = GetArrayCopies(array, possibleMoves.length)
-
-    const branches : Branch[] = []
-    for (let i = 0; i < possibleMoves.length; i++) {
-        if (EvaluateMove(arrayCopies[i], possibleMoves[i], fPlayer)) {
-            return possibleMoves[i]
-        }
-        else {
-            let possibleBranch = CreateBranch([possibleMoves[i]], '');
-            let bs = EvaluateRecursive(possibleBranch, arrayCopies[i], 'X')
-            branches.push(...bs)
-        }
-    }
+    
+    const branches : Branch[] = EvaluateRecursive(CreateBranch([], ''), board.value, fPlayer)
 
     const moves : Move[] = EvaluateBranches(branches)
 
