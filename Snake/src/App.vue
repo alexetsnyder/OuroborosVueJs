@@ -1,12 +1,12 @@
 <script setup lang="ts">
 
-
+import Snake from './components/Snake.vue'
 
 </script>
 
 <template>
   <main>
-    <h1>Hello World!</h1>
+    <Snake/>
   </main>
 </template>
 
