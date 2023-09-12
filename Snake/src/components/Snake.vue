@@ -15,7 +15,6 @@ const snakeDirections = {
 
 let intervalId : number | undefined;
 
-const board : Ref<string[]> = ref([])
 const snakeQueue : Ref<number[]> = ref([])
 const snakeDir : Ref<number[]> = ref(snakeDirections.left)
 const appleSpawn : Ref<number> = ref(0)
@@ -23,15 +22,6 @@ const appleSpawn : Ref<number> = ref(0)
 const backgroundColor : string = '#808080'
 const snakeColor : string = '#6CBB3C'
 const appleColor : string = '#ff0000'
-
-function CreateBoard() : void {
-    for (let i = 0; i < boardRows; i++) {
-        for (let j = 0; j < boardCols; j++) {
-            board.value.push(backgroundColor)
-        }
-    }
-}
-CreateBoard()
 
 function CreateSnake() : void {
     let i = boardRows / 4
@@ -69,7 +59,7 @@ function GetRandomElement(array:number[]) : number {
 
 function GetAppleSpawn() : void {
     const possibleSpawns : number[] = []
-    for (let i = 0; i < board.value.length; i++) {
+    for (let i = 0; i < boardRows * boardCols; i++) {
         if (!snakeQueue.value.includes(i)) {
             possibleSpawns.push(i)
         }
@@ -81,7 +71,7 @@ GetAppleSpawn()
 
 const snakeBoard : ComputedRef<string[]> = computed(() => {
     const newBoard : string[] = []
-    for (let i = 0; i < board.value.length; i++) {
+    for (let i = 0; i < boardRows * boardCols; i++) {
         if (i === appleSpawn.value) {
             newBoard.push(appleColor)
         }
@@ -97,7 +87,7 @@ const snakeBoard : ComputedRef<string[]> = computed(() => {
 
 function Start() : void {
     if (!intervalId) {
-        intervalId = setInterval(MoveSnake, 100)
+        intervalId = setInterval(MoveSnake, 150)
     } 
 }
 
