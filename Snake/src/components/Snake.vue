@@ -26,22 +26,10 @@ CreateBoard()
     <div class="container">
         <div class="row" v-for="i in boardRows" :key="i">
             <div class="column" v-for="j in boardCols" :key="j">
-                <div class="cell bottom-cell right-cell" v-if="i == boardRows && j == boardCols" :style="{ background: board[(i - 1) * boardCols + (j - 1)] }">
-
-                </div>
-                <div class="cell bottom-cell" v-else-if="i == boardRows" :style="{ background: board[(i - 1) * boardCols + (j - 1)] }">
-                
-                </div>
-                <div class="cell right-cell" v-else-if="j == boardCols" :style="{ background: board[(i - 1) * boardCols + (j - 1)] }">
-
-                </div>
-                <div class="cell" v-else :style="{ background: board[(i - 1) * boardCols + (j - 1)] }">
-
-                </div>
+                <div :class="{ cell: true, 'bottom-cell': i == boardRows, 'right-cell': j == boardCols }" :style="{ background: board[(i - 1) * boardCols + (j - 1)] }"/>
             </div>
         </div>
     </div>
-
 </template>
 
 <style scoped>
