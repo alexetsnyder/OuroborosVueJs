@@ -9,9 +9,11 @@ const boardCols : number = 40
 const snakeDirections = {
     left: [-1, 0],
     right: [1, 0],
-    up: [0, 1],
-    down: [0, -1]
+    up: [0, -1],
+    down: [0, 1]
 }
+
+let intervalId : number | undefined;
 
 const board : Ref<string[]> = ref([])
 const snakeQueue : Ref<number[]> = ref([])
@@ -45,12 +47,19 @@ function MoveSnake() : void {
     let j = head % boardCols
     let i = (head - j) / boardCols
 
-    i += snakeDir.value[0]
-    j += snakeDir.value[1]
+    i += snakeDir.value[1]
+    j += snakeDir.value[0]
 
     if (i >= 0 && i < boardRows && j >= 0 && j < boardCols) {
-        snakeQueue.value.shift()
-        snakeQueue.value.push(i * boardCols + j)
+        let index = i * boardCols + j
+        snakeQueue.value.push(index)
+        if (index === appleSpawn.value) {
+            GetAppleSpawn()
+        }
+        else {
+            snakeQueue.value.shift()
+        }  
+        
     }
 }
 
@@ -86,8 +95,30 @@ const snakeBoard : ComputedRef<string[]> = computed(() => {
     return newBoard
 })
 
-function KeyDown(event : Event) : void {
-    console.log(event)
+function Start() : void {
+    if (!intervalId) {
+        intervalId = setInterval(MoveSnake, 100)
+    } 
+}
+
+function Stop() : void {
+    clearInterval(intervalId)
+    intervalId = undefined;
+}
+
+function KeyDown(event : KeyboardEvent) : void {
+    if (event.key === 'w') {
+        snakeDir.value = snakeDirections.up
+    }
+    if (event.key === 's') {
+        snakeDir.value = snakeDirections.down
+    }
+    if (event.key === 'a') {
+        snakeDir.value = snakeDirections.left
+    }
+    if (event.key === 'd') {
+        snakeDir.value = snakeDirections.right
+    }
 }
 
 onMounted(() => {
@@ -111,12 +142,23 @@ onMounted(() => {
             </div>
         </div>
     </div>
+
+   <div class="center-button">
+        <button @click="Start">Start</button>
+        <button @click="Stop">Stop</button>
+   </div> 
+   
 </template>
 
 <style scoped>
 
 h1 {
     text-align: center;
+}
+
+.center-button {
+    text-align: center;
+    padding-top: 20px;
 }
 
 .container {
