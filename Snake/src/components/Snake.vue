@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
-import { ref, computed, onMounted } from 'vue'
-import type { Ref, ComputedRef } from 'vue'
+import { ref, onMounted } from 'vue'
+import type { Ref } from 'vue'
 
 const boardRows : number = 40
 const boardCols : number = 40
@@ -15,6 +15,7 @@ const snakeDirections = {
 
 let intervalId : number | undefined;
 
+const snakeBoard : Ref<string[]> = ref([])
 const snakeQueue : Ref<number[]> = ref([])
 const snakeDir : Ref<number[]> = ref(snakeDirections.left)
 const appleSpawn : Ref<number> = ref(0)
@@ -23,13 +24,63 @@ const backgroundColor : string = '#808080'
 const snakeColor : string = '#6CBB3C'
 const appleColor : string = '#ff0000'
 
+function CreateBoard() : void {
+    for (let i = 0; i < boardRows; i++) {
+        for (let j = 0; j < boardCols; j++) {
+            snakeBoard.value.push(backgroundColor)
+        }
+    }
+}
+
 function CreateSnake() : void {
     let i = boardRows / 4
     let j = boardCols / 2 + boardCols / 4
 
     snakeQueue.value.push(i * boardCols + j)
 }
+
+function GetRandomElement(array:number[]) : number {
+    return array[Math.floor(Math.random() * array.length)]
+} 
+
+function GetAppleSpawn() : void {
+    const possibleSpawns : number[] = []
+    for (let i = 0; i < boardRows * boardCols; i++) {
+        if (!snakeQueue.value.includes(i)) {
+            possibleSpawns.push(i)
+        }
+    }
+
+    appleSpawn.value = GetRandomElement(possibleSpawns)
+}
+
+function UpdateSnakeBoard() {
+    for (let i = 0; i < snakeBoard.value.length; i++) {
+        if (i === appleSpawn.value) {
+            if (snakeBoard.value[i] !== appleColor) {
+                snakeBoard.value[i] = appleColor
+            }
+        }
+        else if (snakeQueue.value.includes(i)) {
+            if (snakeBoard.value[i] !== snakeColor) {
+                snakeBoard.value[i] = snakeColor
+            }
+        }
+        else {
+            if (snakeBoard.value[i] !== backgroundColor) {
+                snakeBoard.value[i] = backgroundColor
+            } 
+        }
+    }
+}
+
+CreateBoard()
+
 CreateSnake()
+
+GetAppleSpawn()
+
+UpdateSnakeBoard()
 
 function MoveSnake() : void {
     const head = snakeQueue.value[snakeQueue.value.length - 1]
@@ -49,45 +100,13 @@ function MoveSnake() : void {
         else {
             snakeQueue.value.shift()
         }  
-        
+        UpdateSnakeBoard()
     }
 }
-
-function GetRandomElement(array:number[]) : number {
-    return array[Math.floor(Math.random() * array.length)]
-} 
-
-function GetAppleSpawn() : void {
-    const possibleSpawns : number[] = []
-    for (let i = 0; i < boardRows * boardCols; i++) {
-        if (!snakeQueue.value.includes(i)) {
-            possibleSpawns.push(i)
-        }
-    }
-
-    appleSpawn.value = GetRandomElement(possibleSpawns)
-}
-GetAppleSpawn()
-
-const snakeBoard : ComputedRef<string[]> = computed(() => {
-    const newBoard : string[] = []
-    for (let i = 0; i < boardRows * boardCols; i++) {
-        if (i === appleSpawn.value) {
-            newBoard.push(appleColor)
-        }
-        else if (snakeQueue.value.includes(i)) {
-            newBoard.push(snakeColor)
-        }
-        else {
-            newBoard.push(backgroundColor)
-        }
-    }
-    return newBoard
-})
 
 function Start() : void {
     if (!intervalId) {
-        intervalId = setInterval(MoveSnake, 150)
+        intervalId = setInterval(MoveSnake, 125)
     } 
 }
 
