@@ -9,13 +9,10 @@ const boardCols : number = 40
 const board : Ref<string[]> = ref([])
 const queue : Ref<number[]> = ref([])
 
-const grey = '#808080'
-const red = '#ff'
-
 function CreateBoard() {
     for (let i = 0; i < boardRows; i++) {
         for (let j = 0; j < boardCols; j++) {
-            board.value.push('#ff0000')
+            board.value.push('#808080')
         }
     }
 }
@@ -26,26 +23,25 @@ CreateBoard()
 <template>
     <h1>Snake!</h1>
 
-    <div>
-        <div class="container">
-            <div class="row" v-for="i in boardRows" :key="i">
-                <div class="column" v-for="j in boardCols" :key="j">
-                    <div class="cell bottom-cell right-cell" v-if="i == boardRows && j == boardCols">
+    <div class="container">
+        <div class="row" v-for="i in boardRows" :key="i">
+            <div class="column" v-for="j in boardCols" :key="j">
+                <div class="cell bottom-cell right-cell" v-if="i == boardRows && j == boardCols" :style="{ background: board[(i - 1) * boardCols + (j - 1)] }">
 
-                    </div>
-                    <div class="cell bottom-cell" v-else-if="i == boardRows">
-                    
-                    </div>
-                    <div class="cell right-cell" v-else-if="j == boardCols">
+                </div>
+                <div class="cell bottom-cell" v-else-if="i == boardRows" :style="{ background: board[(i - 1) * boardCols + (j - 1)] }">
+                
+                </div>
+                <div class="cell right-cell" v-else-if="j == boardCols" :style="{ background: board[(i - 1) * boardCols + (j - 1)] }">
 
-                    </div>
-                    <div class="cell" v-else>
+                </div>
+                <div class="cell" v-else :style="{ background: board[(i - 1) * boardCols + (j - 1)] }">
 
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 </template>
 
 <style scoped>
@@ -55,7 +51,7 @@ h1 {
 }
 
 .container {
-    transform: translateX(136%);
+    margin: auto;
     width: 520px;
 }
 
@@ -78,6 +74,7 @@ h1 {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    width: 520px;
 }
 
 .column {
