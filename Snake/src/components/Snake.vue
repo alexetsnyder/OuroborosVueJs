@@ -23,7 +23,7 @@ const snakeQueue : Ref<number[]> = ref([])
 const snakeDir : Ref<number[]> = ref(snakeDirections.left)
 const appleSpawn : Ref<number> = ref(0)
 
-const backgroundColor : string = '#808080'
+const backgroundColor : string = '#013220'
 const snakeColor : string = '#6CBB3C'
 const appleColor : string = '#ff0000'
 
@@ -146,13 +146,12 @@ function Start() : void {
     } 
 }
 
-function Restart() : void {
+function Reset() : void {
+    Stop()
     isGameOver = false;
     statusText.value = ''
     snakeDir.value = snakeDirections.left
-    Stop()
     SetUpGame()
-    Start()
 }
 
 function Stop() : void {
@@ -204,7 +203,7 @@ onMounted(() => {
    <div class="center-button">
         <button @click="Start">Start</button>
         <button @click="Stop">Stop</button>
-        <button @click="Restart">Restart</button>
+        <button @click="Reset">Reset</button>
    </div> 
    
 </template>
@@ -213,11 +212,27 @@ onMounted(() => {
 
 h1 {
     text-align: center;
+    font-size: 48px;
 }
 
 .center-button {
     text-align: center;
     padding-top: 20px;
+}
+
+button {
+    background-color: #013220;
+    padding: 15px 32px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #6CBB3C;
 }
 
 .container {
