@@ -117,6 +117,10 @@ function MoveSnake() : void {
                 snakeQueue.value.shift()
             }  
             UpdateSnakeBoard()
+
+            if (snakeQueue.value.length === snakeBoard.value.length) {
+                WinGame()
+            }
         } 
     }
     else {
@@ -128,6 +132,12 @@ function LostGame() {
     Stop();
     statusText.value = 'You Lose!'
     isGameOver = true
+}
+
+function WinGame() {
+    Stop();
+    statusText.value = 'You Win!'
+    isGameOver = true;
 }
 
 function Start() : void {
@@ -181,7 +191,7 @@ onMounted(() => {
 <template>
     <h1>Snake!</h1>
 
-    <div class="container">
+    <div :style="{ width: boardCols * 13 + 'px' }" class="container">
         <div class="row" v-for="i in boardRows" :key="i">
             <div class="column" v-for="j in boardCols" :key="j">
                 <div :class="{ cell: true, 'bottom-cell': i == boardRows, 'right-cell': j == boardCols }" :style="{ background: snakeBoard[(i - 1) * boardCols + (j - 1)] }"/>
@@ -212,7 +222,6 @@ h1 {
 
 .container {
     margin: auto;
-    width: 520px;
 }
 
 .cell {
@@ -234,7 +243,6 @@ h1 {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    width: 520px;
 }
 
 .column {
