@@ -168,16 +168,24 @@ function Stop() : void {
 
 function KeyDown(event : KeyboardEvent) : void {
     if (event.key === 'w') {
-        snakeDir.value = snakeDirections.up
+        if (snakeDir.value[0] !== snakeDirections.down[0] && snakeDir.value[1] !== snakeDirections.down[1]) {
+            snakeDir.value = snakeDirections.up
+        } 
     }
     if (event.key === 's') {
-        snakeDir.value = snakeDirections.down
+        if (snakeDir.value[0] !== snakeDirections.up[0] && snakeDir.value[1] !== snakeDirections.up[1]) {
+            snakeDir.value = snakeDirections.down
+        }  
     }
     if (event.key === 'a') {
-        snakeDir.value = snakeDirections.left
+        if (snakeDir.value[0] !== snakeDirections.right[0] && snakeDir.value[1] !== snakeDirections.right[1]) {
+            snakeDir.value = snakeDirections.left
+        }
     }
     if (event.key === 'd') {
-        snakeDir.value = snakeDirections.right
+        if (snakeDir.value[0] !== snakeDirections.left[0] && snakeDir.value[1] !== snakeDirections.left[1]) {
+            snakeDir.value = snakeDirections.right
+        }   
     }
 }
 
