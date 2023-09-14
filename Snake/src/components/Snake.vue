@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import type { Ref } from 'vue'
 
-const boardRows : number = 40
-const boardCols : number = 40
+const boardRowsDefault : number = 40
+const boardColsDefault : number = 40
 
 const snakeDirections = {
     left: [-1, 0],
@@ -17,6 +17,8 @@ let intervalId : number | undefined;
 
 let isGameOver : boolean = false;
 
+const boardRows : Ref<number> = ref(boardRowsDefault)
+const boardCols : Ref<number> = ref(boardColsDefault)
 const statusText : Ref<string> = ref('')
 const snakeBoard : Ref<string[]> = ref([])
 const snakeQueue : Ref<number[]> = ref([])
@@ -28,16 +30,21 @@ const snakeColor : string = '#6CBB3C'
 const appleColor : string = '#ff0000'
 
 function SetUpBoard() : void {
-    if (snakeBoard.value.length === 0) {
-        for (let i = 0; i < boardRows; i++) {
-            for (let j = 0; j < boardCols; j++) {
-                snakeBoard.value.push(backgroundColor)
-            }
-        }
+    if (snakeBoard.value.length > 0) {
+        snakeBoard.value.length = 0
     }
-    else {
-        for (let i = 0; i < snakeBoard.value.length; i++) {
-            snakeBoard.value[i] = backgroundColor
+
+    if (!boardRows.value) {
+        boardRows.value = boardRowsDefault
+    }
+
+    if (!boardCols.value) {
+        boardCols.value = boardColsDefault
+    }
+
+    for (let i = 0; i < boardRows.value; i++) {
+        for (let j = 0; j < boardCols.value; j++) {
+            snakeBoard.value.push(backgroundColor)
         }
     }
 }
@@ -45,10 +52,10 @@ function SetUpBoard() : void {
 function SetUpSnake() : void {
     snakeQueue.value.length = 0
 
-    let i = boardRows / 4
-    let j = boardCols / 2 + boardCols / 4
+    let i = Math.floor(boardRows.value / 4)
+    let j = Math.floor(boardCols.value / 2 + boardCols.value / 4)
 
-    snakeQueue.value.push(i * boardCols + j)
+    snakeQueue.value.push(i * boardCols.value + j)
 }
 
 function GetRandomElement(array:number[]) : number {
@@ -57,7 +64,7 @@ function GetRandomElement(array:number[]) : number {
 
 function SetUpAppleSpawn() : void {
     const possibleSpawns : number[] = []
-    for (let i = 0; i < boardRows * boardCols; i++) {
+    for (let i = 0; i < boardRows.value * boardCols.value; i++) {
         if (!snakeQueue.value.includes(i)) {
             possibleSpawns.push(i)
         }
@@ -96,14 +103,14 @@ function SetUpGame() {
 function MoveSnake() : void {
     const head = snakeQueue.value[snakeQueue.value.length - 1]
     
-    let j = head % boardCols
-    let i = (head - j) / boardCols
+    let j = head % boardCols.value
+    let i = (head - j) / boardCols.value
 
     i += snakeDir.value[1]
     j += snakeDir.value[0]
 
-    if (i >= 0 && i < boardRows && j >= 0 && j < boardCols) {
-        let index = i * boardCols + j
+    if (i >= 0 && i < boardRows.value && j >= 0 && j < boardCols.value) {
+        let index = i * boardCols.value + j
 
         if (snakeQueue.value.includes(index)) {
             LostGame()
@@ -176,6 +183,14 @@ function KeyDown(event : KeyboardEvent) : void {
 
 SetUpGame();
 
+watch(boardRows, () => {
+    Reset()
+})
+
+watch(boardCols, () => {
+    Reset()
+})
+
 onMounted(() => {
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Tab') {
@@ -200,7 +215,14 @@ onMounted(() => {
 
     <h1 v-if="statusText"> {{ statusText }} </h1>
 
-   <div class="center-button">
+    <div class="center">
+        <label>Rows: </label>
+        <input type="number" v-model="boardRows">
+        <label> Cols: </label>
+        <input type="number" v-model="boardCols">
+    </div>
+
+   <div class="center">
         <button @click="Start">Start</button>
         <button @click="Stop">Stop</button>
         <button @click="Reset">Reset</button>
@@ -215,9 +237,14 @@ h1 {
     font-size: 48px;
 }
 
-.center-button {
+.center {
     text-align: center;
     padding-top: 20px;
+}
+
+input {
+    background-color: #6CBB3C;
+    width: 40px;
 }
 
 button {
@@ -232,7 +259,7 @@ button {
 }
 
 button:hover {
-    background-color: #6CBB3C;
+    background-color: darkgreen;
 }
 
 .container {
