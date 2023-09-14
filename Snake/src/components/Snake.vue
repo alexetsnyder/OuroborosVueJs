@@ -15,6 +15,9 @@ const snakeDirections = {
 
 let intervalId : number | undefined;
 
+let isGameOver : boolean = false;
+
+const statusText : Ref<string> = ref('')
 const snakeBoard : Ref<string[]> = ref([])
 const snakeQueue : Ref<number[]> = ref([])
 const snakeDir : Ref<number[]> = ref(snakeDirections.left)
@@ -24,15 +27,24 @@ const backgroundColor : string = '#808080'
 const snakeColor : string = '#6CBB3C'
 const appleColor : string = '#ff0000'
 
-function CreateBoard() : void {
-    for (let i = 0; i < boardRows; i++) {
-        for (let j = 0; j < boardCols; j++) {
-            snakeBoard.value.push(backgroundColor)
+function SetUpBoard() : void {
+    if (snakeBoard.value.length === 0) {
+        for (let i = 0; i < boardRows; i++) {
+            for (let j = 0; j < boardCols; j++) {
+                snakeBoard.value.push(backgroundColor)
+            }
+        }
+    }
+    else {
+        for (let i = 0; i < snakeBoard.value.length; i++) {
+            snakeBoard.value[i] = backgroundColor
         }
     }
 }
 
-function CreateSnake() : void {
+function SetUpSnake() : void {
+    snakeQueue.value.length = 0
+
     let i = boardRows / 4
     let j = boardCols / 2 + boardCols / 4
 
@@ -43,7 +55,7 @@ function GetRandomElement(array:number[]) : number {
     return array[Math.floor(Math.random() * array.length)]
 } 
 
-function GetAppleSpawn() : void {
+function SetUpAppleSpawn() : void {
     const possibleSpawns : number[] = []
     for (let i = 0; i < boardRows * boardCols; i++) {
         if (!snakeQueue.value.includes(i)) {
@@ -74,13 +86,12 @@ function UpdateSnakeBoard() {
     }
 }
 
-CreateBoard()
-
-CreateSnake()
-
-GetAppleSpawn()
-
-UpdateSnakeBoard()
+function SetUpGame() {
+    SetUpBoard()
+    SetUpSnake()
+    SetUpAppleSpawn()
+    UpdateSnakeBoard()
+}
 
 function MoveSnake() : void {
     const head = snakeQueue.value[snakeQueue.value.length - 1]
@@ -93,21 +104,45 @@ function MoveSnake() : void {
 
     if (i >= 0 && i < boardRows && j >= 0 && j < boardCols) {
         let index = i * boardCols + j
-        snakeQueue.value.push(index)
-        if (index === appleSpawn.value) {
-            GetAppleSpawn()
+
+        if (snakeQueue.value.includes(index)) {
+            LostGame()
         }
         else {
-            snakeQueue.value.shift()
-        }  
-        UpdateSnakeBoard()
+            snakeQueue.value.push(index)
+            if (index === appleSpawn.value) {
+                SetUpAppleSpawn()
+            }
+            else {
+                snakeQueue.value.shift()
+            }  
+            UpdateSnakeBoard()
+        } 
+    }
+    else {
+        LostGame()
     }
 }
 
+function LostGame() {
+    Stop();
+    statusText.value = 'You Lose!'
+    isGameOver = true
+}
+
 function Start() : void {
-    if (!intervalId) {
-        intervalId = setInterval(MoveSnake, 125)
+    if (!intervalId && !isGameOver) {
+        intervalId = setInterval(MoveSnake, 160)
     } 
+}
+
+function Restart() : void {
+    isGameOver = false;
+    statusText.value = ''
+    snakeDir.value = snakeDirections.left
+    Stop()
+    SetUpGame()
+    Start()
 }
 
 function Stop() : void {
@@ -129,6 +164,8 @@ function KeyDown(event : KeyboardEvent) : void {
         snakeDir.value = snakeDirections.right
     }
 }
+
+SetUpGame();
 
 onMounted(() => {
     window.addEventListener('keydown', (e) => {
@@ -152,9 +189,12 @@ onMounted(() => {
         </div>
     </div>
 
+    <h1 v-if="statusText"> {{ statusText }} </h1>
+
    <div class="center-button">
         <button @click="Start">Start</button>
         <button @click="Stop">Stop</button>
+        <button @click="Restart">Restart</button>
    </div> 
    
 </template>
