@@ -166,24 +166,31 @@ function Stop() : void {
     intervalId = undefined;
 }
 
+function IsInputAllowed(currentDir:number[], oppDir:number[]) {
+    if (currentDir[0] === oppDir[0] && currentDir[1] === oppDir[1]) {
+        return false
+    }
+    return true;
+}
+
 function KeyDown(event : KeyboardEvent) : void {
     if (event.key === 'w') {
-        if (snakeDir.value[0] !== snakeDirections.down[0] && snakeDir.value[1] !== snakeDirections.down[1]) {
+        if (IsInputAllowed(snakeDir.value, snakeDirections.down)) {
             snakeDir.value = snakeDirections.up
         } 
     }
     if (event.key === 's') {
-        if (snakeDir.value[0] !== snakeDirections.up[0] && snakeDir.value[1] !== snakeDirections.up[1]) {
+        if (IsInputAllowed(snakeDir.value, snakeDirections.up)) {
             snakeDir.value = snakeDirections.down
         }  
     }
     if (event.key === 'a') {
-        if (snakeDir.value[0] !== snakeDirections.right[0] && snakeDir.value[1] !== snakeDirections.right[1]) {
+        if (IsInputAllowed(snakeDir.value, snakeDirections.right)) {
             snakeDir.value = snakeDirections.left
         }
     }
     if (event.key === 'd') {
-        if (snakeDir.value[0] !== snakeDirections.left[0] && snakeDir.value[1] !== snakeDirections.left[1]) {
+        if (IsInputAllowed(snakeDir.value, snakeDirections.left)) {
             snakeDir.value = snakeDirections.right
         }   
     }
