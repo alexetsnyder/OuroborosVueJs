@@ -6,7 +6,7 @@ import type { Ref } from 'vue'
 const boardRowsDefault : number = 40
 const boardColsDefault : number = 40
 
-const snakeDirections = {
+const snakeDirections : Object = {
     left: [-1, 0],
     right: [1, 0],
     up: [0, -1],
@@ -73,7 +73,7 @@ function SetUpAppleSpawn() : void {
     appleSpawn.value = GetRandomElement(possibleSpawns)
 }
 
-function UpdateSnakeBoard() {
+function UpdateSnakeBoard() : void {
     for (let i = 0; i < snakeBoard.value.length; i++) {
         if (i === appleSpawn.value) {
             if (snakeBoard.value[i] !== appleColor) {
@@ -93,7 +93,7 @@ function UpdateSnakeBoard() {
     }
 }
 
-function SetUpGame() {
+function SetUpGame() : void {
     SetUpBoard()
     SetUpSnake()
     SetUpAppleSpawn()
@@ -140,13 +140,13 @@ function MoveSnake() : void {
     }
 }
 
-function LostGame() {
+function LostGame() : void {
     Stop();
     statusText.value = 'You Lose!'
     isGameOver = true
 }
 
-function WinGame() {
+function WinGame() : void {
     Stop();
     statusText.value = 'You Win!'
     isGameOver = true;
@@ -171,7 +171,7 @@ function Stop() : void {
     intervalId = undefined;
 }
 
-function IsInputAllowed(currentDir:number[], oppDir:number[]) {
+function IsInputAllowed(currentDir:number[], oppDir:number[]) : boolean {
     if (currentDir[0] === oppDir[0] && currentDir[1] === oppDir[1] || 
         !hasMoved && pastDir[0] === oppDir[0] && pastDir[1] === oppDir[1]) {
         return false
