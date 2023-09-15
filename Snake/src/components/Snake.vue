@@ -100,6 +100,9 @@ function SetUpGame() {
     UpdateSnakeBoard()
 }
 
+let hasMoved : boolean = false;
+let pastDir : number[] = snakeDir.value;
+
 function MoveSnake() : void {
     const head = snakeQueue.value[snakeQueue.value.length - 1]
     
@@ -124,6 +127,8 @@ function MoveSnake() : void {
                 snakeQueue.value.shift()
             }  
             UpdateSnakeBoard()
+
+            hasMoved = true;
 
             if (snakeQueue.value.length === snakeBoard.value.length) {
                 WinGame()
@@ -167,30 +172,39 @@ function Stop() : void {
 }
 
 function IsInputAllowed(currentDir:number[], oppDir:number[]) {
-    if (currentDir[0] === oppDir[0] && currentDir[1] === oppDir[1]) {
+    if (currentDir[0] === oppDir[0] && currentDir[1] === oppDir[1] || 
+        !hasMoved && pastDir[0] === oppDir[0] && pastDir[1] === oppDir[1]) {
         return false
     }
     return true;
 }
 
 function KeyDown(event : KeyboardEvent) : void {
-    if (event.key === 'w') {
+    if (event.key.toLowerCase() === 'w') {
         if (IsInputAllowed(snakeDir.value, snakeDirections.down)) {
+            hasMoved = false
+            pastDir = snakeDir.value
             snakeDir.value = snakeDirections.up
         } 
     }
-    if (event.key === 's') {
+    if (event.key.toLowerCase() === 's') {
         if (IsInputAllowed(snakeDir.value, snakeDirections.up)) {
+            hasMoved = false
+            pastDir = snakeDir.value
             snakeDir.value = snakeDirections.down
         }  
     }
-    if (event.key === 'a') {
+    if (event.key.toLowerCase() === 'a') {
         if (IsInputAllowed(snakeDir.value, snakeDirections.right)) {
+            hasMoved = false
+            pastDir = snakeDir.value
             snakeDir.value = snakeDirections.left
         }
     }
-    if (event.key === 'd') {
+    if (event.key.toLowerCase() === 'd') {
         if (IsInputAllowed(snakeDir.value, snakeDirections.left)) {
+            hasMoved = false
+            pastDir = snakeDir.value
             snakeDir.value = snakeDirections.right
         }   
     }
