@@ -6,7 +6,14 @@ import type { Ref } from 'vue'
 const boardRowsDefault : number = 40
 const boardColsDefault : number = 40
 
-const snakeDirections : Object = {
+interface snakeDirType {
+    left: number[];
+    right: number[];
+    up: number[];
+    down: number[];
+}
+
+const snakeDirections : snakeDirType = {
     left: [-1, 0],
     right: [1, 0],
     up: [0, -1],
